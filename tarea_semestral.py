@@ -70,10 +70,6 @@ def validar_archivo_de_entrada(nombre_archivo):
             print("En la tercera linea los dos numeros deben ser menor a 50")
             return False
         
-                
-        print(segunda) 
-        
-        
         tercera = lineas[2] # Se pasa la tercera linea de el archivo a una variable para evaluar que siga el formato
         try:
             tercera = int(tercera) # se intenta convertir la tecera linea a numero entero
@@ -88,22 +84,28 @@ def validar_archivo_de_entrada(nombre_archivo):
         cadenas_adn = lineas[3:]
         
         if len(cadenas_adn) != tercera: # valida cantidad indicada de cadenas en el archivo
-            print("la cantidad de cadenas de adn debe ser la indicada en la tercera linea 'nombre_archivo'")
+            print(f"\nLa cantidad de cadenas de adn debe ser la indicada en la tercera linea de '{nombre_archivo}'")
             return False
         
         for i in cadenas_adn:
-            if len(i) < segundaA:
+            for letra in i: # Revisar que las cadenas solo tengan bases nitrogenadas de ADN
+                if letra not in ("A", "C", "G", "T"):
+                    print("Una de las cadenas de ADN se encuentrá mal:\n ", end="")
+                    print(i)
+                    return False
+                
+            if len(i) < segundaA: # cadena de menor tamaño dentro del rango
                 print("Una de las cadenas es mas corta de lo que deberia")
                 return False
-            if len(i) > segundaB:
+            if len(i) > segundaB: # cadena de mayor tamaño dentro del rango
                 print("Una de las cadenas es mas larga de lo indicado")
+                return False
         
         
-        print("Cadena validada")
+        print(f"'{nombre_archivo}' validado correctamente.\n")
         return True
         
             
-
 # 2
 def obtener_cadenas(nombre_archivo):
     """ Recibe el nombre del archivo del que obtener las cadenas a ordenar
@@ -115,10 +117,6 @@ def obtener_cadenas(nombre_archivo):
         L.append(i.strip("\n"))
     cadenas = L[3:]
     return cadenas
-
-
-print(obtener_cadenas("ADN.dat"))
-
 
 #3
 def ordenar_cadenas(cadenas_adn):
@@ -136,6 +134,7 @@ def ordenar_cadenas(cadenas_adn):
     3. En caso de que dos o mas cadenas poseen la misma medida de desorden estas deben ordenarse 
     desde la que posee mayor longitud hasta la que tiene menor longitud.
 
+    
         
     """
     pass
@@ -149,12 +148,45 @@ def generar_archivo_ordenado(cadena_ordenada, nombre_archivo):
 
     pass
 
-# n=input("ingrese el nombre del archivo donde se encuentren las cadenas de ADN ")
-# while validar(n) == False:
-#     print("Error, el archivo no sigue el formato")
-#     n=input("ingrese nuevamente el nombre del archivo ")
-# if validar(n) == True:
 
-validar_archivo_de_entrada("ADNtest.dat") # esta es la entrada 
+def desorden_cadena(cadena):
+    nueva_cadena = ""
+    for i in cadena:  # generando cadena de numeros
+        if i == "A":
+            nueva_cadena = nueva_cadena + "1"
+        if i == "C":
+            nueva_cadena = nueva_cadena + "2"
+        if i == "G":
+            nueva_cadena = nueva_cadena + "3"
+        if i == "T":
+            nueva_cadena = nueva_cadena + "4"
 
-    
+    # viendo desorden
+    contador = 0
+    for indice in range(len(nueva_cadena)):
+        evaluar = int(nueva_cadena[indice])
+        for i in nueva_cadena[indice + 1:]:
+            if evaluar > int(i):
+                contador += 1
+    return contador
+
+
+# Acá abajo inicia el programa
+
+print("Ordenamiento de cadenas de ADN.\n")
+archivo = input("Indique el nombre del archivo que desea analizar y se creará un archivo con las cadenas ordenadas: \n")
+
+while not validar_archivo_de_entrada(archivo):
+    reintentar = input("Validación fallida, ¿ desea intentar nuevamente ? (s/n): ")
+    if reintentar == "s":
+        archivo = input("Indique el nombre del archivo que desea analizar y se creará un archivo con las cadenas ordenadas: \n")
+        continue
+    else:
+        print("\nPrograma finalizado.\n")
+        exit()
+
+cadenas = obtener_cadenas(archivo)
+
+for i in cadenas:
+    print(desorden_cadena(i))
+
