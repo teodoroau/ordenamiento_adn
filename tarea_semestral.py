@@ -85,20 +85,39 @@ def validar_archivo_de_entrada(nombre_archivo):
             print("error, debe ser un valor mayor o a 0 y menor que 50 ")
             return False
         
+        cadenas_adn = lineas[3:]
+        
+        if len(cadenas_adn) != tercera: # valida cantidad indicada de cadenas en el archivo
+            print("la cantidad de cadenas de adn debe ser la indicada en la tercera linea 'nombre_archivo'")
+            return False
+        
+        for i in cadenas_adn:
+            if len(i) < segundaA:
+                print("Una de las cadenas es mas corta de lo que deberia")
+                return False
+            if len(i) > segundaB:
+                print("Una de las cadenas es mas larga de lo indicado")
+        
         
         print("Cadena validada")
         return True
         
             
-            
-    pass
 
 # 2
 def obtener_cadenas(nombre_archivo):
     """ Recibe el nombre del archivo del que obtener las cadenas a ordenar
     Devuelve una lista con las cadenas en el mismo orden que en el archivo
     """ 
-    pass
+    archivo = open(f"{nombre_archivo}")
+    L = list()
+    for i in archivo:
+        L.append(i.strip("\n"))
+    cadenas = L[3:]
+    return cadenas
+
+
+print(obtener_cadenas("ADN.dat"))
 
 
 #3
@@ -136,9 +155,6 @@ def generar_archivo_ordenado(cadena_ordenada, nombre_archivo):
 #     n=input("ingrese nuevamente el nombre del archivo ")
 # if validar(n) == True:
 
+validar_archivo_de_entrada("ADNtest.dat") # esta es la entrada 
 
-
-#5
-
-def desorden (cadena):
     
