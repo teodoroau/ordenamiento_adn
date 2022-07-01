@@ -26,7 +26,7 @@ def validar_archivo_de_entrada(nombre_archivo):
 
     print(f"Validando {nombre_archivo}")
 
-    with open(nombre_archivo) as archivo:
+    with open(nombre_archivo, "r") as archivo:
         L = []
         for i in archivo:
             L.append(i.strip())
@@ -115,37 +115,6 @@ def obtener_cadenas(nombre_archivo):
     return cadenas
 
 
-# 3
-def ordenar_cadenas(cadenas_adn):
-    """ Recibe una lista de cadenas desordenadas y
-    devuelve una lista con las cadenas ordenadas
-    segun las siguintes reglas:
-
-    1. Le otorgaremos un valor a cada letra segun su orden alfabetico, posteriormente analizaremos letra por letra 
-    y por cada letra que se ubique posteriormente a la cadena y posea un valor menor a la letra analizada se sumara
-    "1" a la medida de desorden para asi despues de analizar cada letra de una cadena, obtendremos su medida de desorden.
-
-    2. La mas ordenada sera la cadena con una menor medida de desorden lo que significa que necesita 
-    menos inversiones para dejar aquella secuencia en orden.
-        
-    3. En caso de que dos o mas cadenas poseen la misma medida de desorden estas deben ordenarse 
-    desde la que posee mayor longitud hasta la que tiene menor longitud.
-
-    
-        
-    """
-    pass
-
-
-# 4 
-def generar_archivo_ordenado(cadena_ordenada, nombre_archivo):
-    """ Recibe la una lista de cadenas ordenadas y crea un archivo
-        de nombre f"{nombre_archivo}.dat" 
-    """
-
-    pass
-
-
 def desorden_cadena(cadena):
     nueva_cadena = ""
     for i in cadena:  # generando cadena de numeros
@@ -168,6 +137,57 @@ def desorden_cadena(cadena):
     return contador
 
 
+# 3
+def ordenar_cadenas(cadenas_adn):
+    """ Recibe una lista de cadenas desordenadas y
+    devuelve una lista con las cadenas ordenadas
+    segun las siguintes reglas:
+
+    1. Le otorgaremos un valor a cada letra segun su orden alfabetico, posteriormente analizaremos letra por letra 
+    y por cada letra que se ubique posteriormente a la cadena y posea un valor menor a la letra analizada se sumara
+    "1" a la medida de desorden para asi despues de analizar cada letra de una cadena, obtendremos su medida de desorden.
+
+    2. La mas ordenada sera la cadena con una menor medida de desorden lo que significa que necesita 
+    menos inversiones para dejar aquella secuencia en orden.
+        
+    3. En caso de que dos o mas cadenas poseen la misma medida de desorden estas deben ordenarse 
+    desde la que posee mayor longitud hasta la que tiene menor longitud.
+
+    4. 
+        
+    """
+    lista=[]
+    ordenada = cadenas_adn[:]
+    cont=0
+    while cont<200:
+      cont=cont+1
+      
+      lista.append(" ")
+   
+    for l in cadenas_adn:
+        lista.insert(desorden_cadena(l) ,l)
+        
+    while ' ' in lista:
+        lista.remove(' ')
+    
+    return lista
+
+# 4 
+def generar_archivo_ordenado(cadena_ordenada, nombre_archivo):
+    """ Recibe la una lista de cadenas ordenadas y crea un archivo
+        de nombre f"{nombre_archivo}.dat" 
+    """
+    if nombre_archivo in os.listdir():
+        entrada = input("Ya existe el archivo {} en la carpeta, ¿desea sobreescribirlo?. (s / n)\n".format(nombre_archivo))
+        if entrada != "s":
+             print("Programa finalizado")
+             exit()
+        
+    with open(nombre_archivo, "w") as archivo_salida:
+        archivo_salida.writelines("\n".join(cadena_ordenada))
+        
+    print(f"Se ha creado el archivo {nombre_archivo}")    
+
 # Acá abajo inicia el programa
 print("Ordenamiento de cadenas de ADN.\n")
 archivo = input("Indique el nombre del archivo que desea analizar y se creará un archivo con las cadenas ordenadas: \n")
@@ -182,7 +202,12 @@ while not validar_archivo_de_entrada(archivo):
         print("\nPrograma finalizado.\n")
         exit()
 
-cadenas = obtener_cadenas(archivo)
+cadenas = obtener_cadenas("ADN.dat")
 
-for i in cadenas:
-    print(desorden_cadena(i))
+cadenas_ordenadas = ordenar_cadenas(cadenas)
+
+generar_archivo_ordenado(cadenas_ordenadas, "SALIDA_{}".format(archivo))
+
+print('Cadenas ordenadas:\n')
+for i in cadenas_ordenadas:
+    print(i)
