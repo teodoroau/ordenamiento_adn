@@ -1,6 +1,5 @@
 import os
 
-
 # 1
 def validar_archivo_de_entrada(nombre_archivo):
     """ Valida que el archivo 'ADN.dat' se encuentre según lo establecido:
@@ -12,7 +11,7 @@ def validar_archivo_de_entrada(nombre_archivo):
         que el 2do definira la longitud maxima que puede tener la cadena.
         En caso de no ser asi, terminará el programa.
 
-        - Tercera linea: la cantidad de cadenas de ADN que se deben procesar, debe ser mayor que 0 y menor que 50
+        - Tercera línea: la cantidad de cadenas de ADN que se deben procesar, debe ser mayor que 0 y menor que 50
 
         -Luego habran tantas L donde cada una contendra una cadena de ADN
 
@@ -28,8 +27,8 @@ def validar_archivo_de_entrada(nombre_archivo):
 
     with open(nombre_archivo, "r") as archivo:
         L = []
-        for i in archivo:
-            L.append(i.strip())
+        for linea in archivo:
+            L.append(linea.strip())
 
         primera = L[0]
         if len(primera.split()) != 1:  # la primera linea debe tener solo una "palabra"
@@ -140,62 +139,99 @@ def desorden_cadena(cadena):
 # 3
 def ordenar_cadenas(cadenas_adn):
     """ Recibe una lista de cadenas desordenadas y
-    devuelve una lista con las cadenas ordenadas
+    devuelve una lista con las cadenas ordenadas decrecientemente
     segun las siguintes reglas:
 
-    1. Le otorgaremos un valor a cada letra segun su orden alfabetico, posteriormente analizaremos letra por letra 
+    1. Le otorgaremos un valor a cada letra segun su orden alfabetico, posteriormente analizaremos letra por letra
     y por cada letra que se ubique posteriormente a la cadena y posea un valor menor a la letra analizada se sumara
     "1" a la medida de desorden para asi despues de analizar cada letra de una cadena, obtendremos su medida de desorden.
 
-    2. La mas ordenada sera la cadena con una menor medida de desorden lo que significa que necesita 
+    2. La más ordenada será la cadena con una menor medida de desorden lo que significa que necesita
     menos inversiones para dejar aquella secuencia en orden.
         
     3. En caso de que dos o mas cadenas poseen la misma medida de desorden estas deben ordenarse 
     desde la que posee mayor longitud hasta la que tiene menor longitud.
 
-    4. 
+    4. Si hay empate con los dos anteriores, irá antes aquel más alfabético
         
     """
-    lista=[]
-    ordenada = cadenas_adn[:]
-    cont=0
-    while cont<200:
-      cont=cont+1
-      
-      lista.append(" ")
-   
-    for l in cadenas_adn:
-        lista.insert(desorden_cadena(l) ,l)
-        
-    while ' ' in lista:
-        lista.remove(' ')
-    
-    return lista
+    def ordenar_por_grado_desorden(cadenas_adn):
+        lista = []
+        cont = 0
+        while cont < 500:
+            cont = cont + 1
+            lista.append(" ")
 
-# 4 
+        for l in cadenas_adn:
+            lista.insert(desorden_cadena(l), l)
+
+        while ' ' in lista:
+            lista.remove(' ')
+
+        return lista
+
+
+    def ordenar_por_len_decendente(lista_de_strings):
+        """ Del más largo al más corto
+        """
+        mayor_a_menor = list()
+        for string in reversed(sorted(lista_de_strings, key=len)):
+            mayor_a_menor.append(string)
+
+        return mayor_a_menor
+
+    def orden_alfabetico(lista):
+        lista_alfabetica = sorted(lista)
+
+        return lista_alfabetica
+        
+    ordenado_por_grado_desorden = ordenar_por_grado_desorden(cadenas_adn)
+    resultado_ordenado = ordenado_por_grado_desorden[:]
+    
+    # orden
+    n = len(resultado_ordenado) #veces que se ordena
+    while n > 0:
+        n -= 1
+        for i in range(len(ordenado_por_grado_desorden) - 2):
+            
+            if desorden_cadena(resultado_ordenado[i]) == desorden_cadena(resultado_ordenado[i + 1]):
+                
+                if len(resultado_ordenado[i]) != len(resultado_ordenado[i + 1]):
+                    resultado_ordenado[i], resultado_ordenado[i + 1] = orden_alfabetico(
+                        resultado_ordenado[i], resultado_ordenado[i + 1])
+                
+                else:
+                    resultado_ordenado[i], resultado_ordenado[i + 1] = ordenar_por_len_decendente(resultado_ordenado[i + 1], resultado_ordenado[i])
+
+        
+    return resultado_ordenado
+
+
+# 4
 def generar_archivo_ordenado(cadena_ordenada, nombre_archivo):
     """ Recibe la una lista de cadenas ordenadas y crea un archivo
         de nombre f"{nombre_archivo}.dat" 
     """
     if nombre_archivo in os.listdir():
-        entrada = input("Ya existe el archivo {} en la carpeta, ¿desea sobreescribirlo?. (s / n)\n".format(nombre_archivo))
+        entrada = input(
+            "Ya existe el archivo {} en la carpeta, ¿desea sobreescribirlo?. (s / n)\n".format(nombre_archivo))
         if entrada != "s":
-             print("Programa finalizado")
-             exit()
-        
+            print("Programa finalizado")
+            exit()
+
     with open(nombre_archivo, "w") as archivo_salida:
         archivo_salida.writelines("\n".join(cadena_ordenada))
-        
-    print(f"Se ha creado el archivo {nombre_archivo}")    
+
+    print(f"Se ha creado el archivo {nombre_archivo}")
+
 
 # Acá abajo inicia el programa
 print("Ordenamiento de cadenas de ADN.\n")
-archivo = input("Indique el nombre del archivo que desea analizar y se creará un archivo con las cadenas ordenadas: \n")
 
-while not validar_archivo_de_entrada(archivo):
+while not validar_archivo_de_entrada(archivo := input("Indique el nombre del archivo que desea analizar y se creará un archivo con las cadenas ordenadas: \n")):
     reintentar = input("Validación fallida, ¿ desea intentar nuevamente ? (s/n): ")
     if reintentar == "s":
-        archivo = input("Indique el nombre del archivo que desea analizar y se creará un archivo con las cadenas "
+        archivo = input("Indique el nombre del archivo que desea analizar y se creará un archivo nuevo con las cadenas "
                         "ordenadas: \n")
         continue
     else:
