@@ -1,4 +1,4 @@
-# Programa para order cadenas de ADN
+# Programa para ordernar cadenas de ADN
 ---
 El programa imprime las cadenas ordenadas de mayor a menor, y también puede generar un archivo de salida en el mismo formato, con
 las cadenas ordenadas en cada caso de prueba.
