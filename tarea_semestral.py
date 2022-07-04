@@ -5,7 +5,7 @@ from nbformat import write
 
 
 def obtener_cadenas(nombre_archivo):
-    """esta funcion recibe el nombre del archivo que debió ya ser validado
+    """ Recibe el nombre del archivo que debió ya ser validado
     y devuelve una lista de listas con las cadenas de los casos de prueba 
     """
     archivo = open(f"{nombre_archivo}")
