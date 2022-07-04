@@ -1,117 +1,126 @@
 import os
+import getpass
 
-# 1
-def validar_archivo_de_entrada(nombre_archivo):
-    """ Valida que el archivo 'ADN.dat' se encuentre según lo establecido:
-        - Primera linea: un numero mayor que 0 y menor que 50. (), que indicara la cantidad
-        de casos de prueba.
+from nbformat import write
 
-        - Segunda linea: dos numeros enteros entre 5 y 50. (), el primer numero ingresado
-        debe ser menor o igual al segundo y definira la longitud minima de la cadena, mientras
-        que el 2do definira la longitud maxima que puede tener la cadena.
-        En caso de no ser asi, terminará el programa.
 
-        - Tercera línea: la cantidad de cadenas de ADN que se deben procesar, debe ser mayor que 0 y menor que 50
-
-        -Luego habran tantas L donde cada una contendra una cadena de ADN
-
-        Si no cumple, lo indica y acaba el programa.
-
-        La funcion devuelve True o False
+def obtener_cadenas(nombre_archivo):
+    """esta funcion recibe el nombre del archivo que debió ya ser validado
+    y devuelve una lista de listas con las cadenas de los casos de prueba 
     """
+    archivo = open(f"{nombre_archivo}")
+    L = list()
+    for i in archivo:
+        L.append(i.strip("\n"))
+    casos_de_prueba = int(L[0])
+    if casos_de_prueba == "1":
+        cadenas = L[3:]
+    else:
+        L = L[1:]
+        cadenas = []
+        for i in range(casos_de_prueba):
+            cadenas.append([])
+            cadenas[i].extend(L[2:int(L[1]) + 2])
+            L=L[int(L[1]) + 2:]
+
+    archivo.close()
+    return cadenas
+
+
+def validar_archivo_de_entrada(nombre_archivo):
+    """ verifica que el archivo que se leerá siga el formato 
+    convencionado.
+    """ 
+    # Revisamos que exista el archivo donde extraer los datos
     if nombre_archivo not in os.listdir():
         print(f"{nombre_archivo} no esta en la carpeta actual")
         return False
 
     print(f"Validando {nombre_archivo}")
 
+    # Leemos el archivo para validar su formato
     with open(nombre_archivo, "r") as archivo:
         L = []
         for linea in archivo:
             L.append(linea.strip())
 
-        primera = L[0]
-        if len(primera.split()) != 1:  # la primera linea debe tener solo una "palabra"
+        casos = L[0] # Casos de prueba
+        if len(casos.split()) != 1:  # la primera linea debe tener solo una "palabra"
             print("La primera linea solo debe contener un numero")
             return False
 
-        if not primera.isnumeric():
+        if not casos.isnumeric():
             print("Debe ser un numero")
             return False
-        primera = int(primera)
+        
+        casos = int(casos)
 
-        if (primera < 1) or (primera > 49):
+        if (casos < 1) or (casos > 49):
             print("Primera linea debe ser un numero mayor que 0 y menor que 50")
             return False
-
-        segunda = L[1]
-        if len(segunda.split()) != 2:
-            print(f"La segunda linea del archivo {nombre_archivo} no tiene 2 numeros")
-            return False
-        else:
-            segunda = segunda.split()
-            segundaA, segundaB = segunda
-            if not all([segundaA.isnumeric(), segundaB.isnumeric()]):
-                print(
-                    f"La segunda linea del archivo {nombre_archivo} no tiene 2 numeros")
+ 
+        casos_prueba = L[1:]
+        for i in range(casos): # evaluar que se siga la estructura en cada caso
+    
+            segunda = casos_prueba[0]
+            if len(segunda.split()) != 2:
+                print(f"La estructura del archivo {nombre_archivo} tiene un problema, "
+                      "revise que la cantidad de cadenas de adn sean las indicadas")
+                print("se esperaban 2 numeros, se encontró", segunda.split(), "en largos cadenas")
                 return False
             else:
-                segundaA = int(segundaA)
-                segundaB = int(segundaB)
-
-        if segundaA < 6 or segundaA > segundaB:
-            print("El primer valor de la segunda linea debe ser mayor q 5 y a lo sumo igual al segundo")
-            return False
-        if segundaB >= 50:
-            print("En la tercera linea los dos numeros deben ser menor a 50")
-            return False
-
-        tercera = L[2]  # Se pasa la tercera linea de el archivo a una variable para evaluar que siga el formato
-        try:
-            tercera = int(tercera)  # se intenta convertir la tecera linea a numero entero
-        except:  # si falla:
-            print("La tercera linea debe contener 1 número")
-            return False  # funcion validar retorna False
-
-        if tercera <= 0 or tercera >= 50:
-            print("error, debe ser un valor mayor o a 0 y menor que 50 ")
-            return False
-
-        cadenas_adn = L[3:]
-
-        if len(cadenas_adn) != tercera:  # valida cantidad indicada de cadenas en el archivo
-            print(f"\nLa cantidad de cadenas de adn debe ser la indicada en la tercera linea de '{nombre_archivo}'")
-            return False
-
-        for i in cadenas_adn:
-            for letra in i:  # Revisar que las cadenas solo tengan bases nitrogenadas de ADN
-                if letra not in ("A", "C", "G", "T"):
-                    print("Una de las cadenas de ADN se encuentrá mal:\n ", end="")
-                    print(i)
+                segunda = segunda.split()
+                segundaA, segundaB = segunda
+                if not all([segundaA.isnumeric(), segundaB.isnumeric()]):
+                    print(
+                        f"La segunda linea del archivo {nombre_archivo} no tiene 2 numeros")
                     return False
+                else:
+                    segundaA = int(segundaA)
+                    segundaB = int(segundaB)
 
-            if len(i) < segundaA:  # cadena de menor tamaño dentro del rango
-                print("Una de las cadenas es mas corta de lo que deberia")
+            if segundaA < 6 or segundaA > segundaB:
+                print("El primer valor de la segunda linea debe ser mayor q 5 y a lo sumo igual al segundo")
                 return False
-            if len(i) > segundaB:  # cadena de mayor tamaño dentro del rango
-                print("Una de las cadenas es mas larga de lo indicado")
+            if segundaB >= 50:
+                print("En la tercera linea los dos numeros deben ser menor a 50")
                 return False
+
+            tercera = casos_prueba[1]
+            try:
+                tercera = int(tercera)  # se intenta convertir la tecera linea a numero entero
+            except:  # si falla:
+                print("La tercera linea debe contener 1 número")
+                return False  # funcion validar retorna False
+
+            if tercera <= 0 or tercera >= 50:
+                print("error, debe ser un valor mayor o a 0 y menor que 50 ")
+                return False
+
+            cadenas_adn = casos_prueba[2:tercera + 2]
+            
+            casos_prueba = casos_prueba[tercera + 2:]
+
+            if len(cadenas_adn) != tercera:  # valida cantidad indicada de cadenas en el archivo
+                print(f"\nLa cantidad de cadenas de adn debe ser la indicada en la tercera linea de '{nombre_archivo}'")
+                return False
+
+            for cadena in cadenas_adn:
+                for letra in cadena:  # Revisar que las cadenas solo tengan bases nitrogenadas de ADN
+                    if letra not in ("A", "C", "G", "T"):
+                        print("Una de las cadenas de ADN se encuentrá mal:\n ", end="")
+                        print(cadena)
+                        return False
+
+                if len(cadena) < segundaA:  # cadena de menor tamaño dentro del rango
+                    print("Una de las cadenas es mas corta de lo que deberia")
+                    return False
+                if len(cadena) > segundaB:  # cadena de mayor tamaño dentro del rango
+                    print("Una de las cadenas es mas larga de lo indicado")
+                    return False
 
         print(f"'{nombre_archivo}' validado correctamente.\n")
         return True
-
-
-# 2
-def obtener_cadenas(nombre_archivo):
-    """ Recibe el nombre del archivo del que obtener las cadenas a ordenar
-    Devuelve una lista con las cadenas en el mismo orden que en el archivo
-    """
-    archivo = open(f"{nombre_archivo}")
-    L = list()
-    for i in archivo:
-        L.append(i.strip("\n"))
-    cadenas = L[3:]
-    return cadenas
 
 
 def desorden_cadena(cadena):
@@ -136,7 +145,6 @@ def desorden_cadena(cadena):
     return contador
 
 
-# 3
 def ordenar_cadenas(cadenas_adn):
     """ Recibe una lista de cadenas desordenadas y
     devuelve una lista con las cadenas ordenadas decrecientemente
@@ -158,7 +166,7 @@ def ordenar_cadenas(cadenas_adn):
     def ordenar_por_grado_desorden(cadenas_adn):
         lista = []
         cont = 0
-        while cont < 500:
+        while cont < 1000:
             cont = cont + 1
             lista.append(" ")
 
@@ -197,21 +205,21 @@ def ordenar_cadenas(cadenas_adn):
             if desorden_cadena(resultado_ordenado[i]) == desorden_cadena(resultado_ordenado[i + 1]):
                 
                 if len(resultado_ordenado[i]) != len(resultado_ordenado[i + 1]):
-                    resultado_ordenado[i], resultado_ordenado[i + 1] = orden_alfabetico(
-                        resultado_ordenado[i], resultado_ordenado[i + 1])
+                    resultado_ordenado[i], resultado_ordenado[i + 1] = orden_alfabetico([
+                        resultado_ordenado[i], resultado_ordenado[i + 1]])
                 
                 else:
-                    resultado_ordenado[i], resultado_ordenado[i + 1] = ordenar_por_len_decendente(resultado_ordenado[i + 1], resultado_ordenado[i])
+                    resultado_ordenado[i], resultado_ordenado[i + 1] = ordenar_por_len_decendente([resultado_ordenado[i + 1], resultado_ordenado[i]])
 
         
     return resultado_ordenado
 
 
-# 4
-def generar_archivo_ordenado(cadena_ordenada, nombre_archivo):
-    """ Recibe la una lista de cadenas ordenadas y crea un archivo
-        de nombre f"{nombre_archivo}.dat" 
+def generar_archivo_ordenado(cadenas_ordenada, nombre_archivo):
+    """ Recibe la una lista de listas de cadenas ordenadas y crea un archivo
+        de nombre SALIDA_'nombre_archivo'.dat 
     """
+    nombre_archivo = "SALIDA_" + nombre_archivo
     if nombre_archivo in os.listdir():
         entrada = input(
             "Ya existe el archivo {} en la carpeta, ¿desea sobreescribirlo?. (s / n)\n".format(nombre_archivo))
@@ -220,15 +228,18 @@ def generar_archivo_ordenado(cadena_ordenada, nombre_archivo):
             exit()
 
     with open(nombre_archivo, "w") as archivo_salida:
-        archivo_salida.writelines("\n".join(cadena_ordenada))
-
+        archivo_salida.write('Cadenas ordenadas:')
+        for caso_de_prueba in range(len(cadenas_ordenadas)):
+            archivo_salida.write(f"\n\nCaso de prueba {caso_de_prueba + 1}")
+            for j in cadenas_ordenadas[caso_de_prueba]:
+                archivo_salida.write("\n" + j)
     print(f"Se ha creado el archivo {nombre_archivo}")
 
 
 # Acá abajo inicia el programa
 print("Ordenamiento de cadenas de ADN.\n")
 
-while not validar_archivo_de_entrada(archivo := input("Indique el nombre del archivo que desea analizar y se creará un archivo con las cadenas ordenadas: \n")):
+while not validar_archivo_de_entrada(archivo := input("Indique el nombre del archivo que desea analizar: \n")):
     reintentar = input("Validación fallida, ¿ desea intentar nuevamente ? (s/n): ")
     if reintentar == "s":
         archivo = input("Indique el nombre del archivo que desea analizar y se creará un archivo nuevo con las cadenas "
@@ -238,12 +249,18 @@ while not validar_archivo_de_entrada(archivo := input("Indique el nombre del arc
         print("\nPrograma finalizado.\n")
         exit()
 
-cadenas = obtener_cadenas("ADN.dat")
+cadenas = obtener_cadenas(archivo)
 
-cadenas_ordenadas = ordenar_cadenas(cadenas)
+cadenas_ordenadas = list(map(ordenar_cadenas, cadenas))
 
-generar_archivo_ordenado(cadenas_ordenadas, "SALIDA_{}".format(archivo))
+print('Cadenas ordenadas:')
+for caso_de_prueba in range(len(cadenas_ordenadas)):
+    print(f"\nCaso de prueba {caso_de_prueba + 1}")
+    for j in cadenas_ordenadas[caso_de_prueba]:
+        print(j)
 
-print('Cadenas ordenadas:\n')
-for i in cadenas_ordenadas:
-    print(i)
+generar_archivo = input(f"\nDesea generar un archivo, con los resultados de los {len(cadenas_ordenadas)} caso/s de prueba ? (s/n)\n")
+if generar_archivo == "s":
+    generar_archivo_ordenado(cadenas_ordenadas, archivo)
+
+final = getpass.getpass("\nPrograma finalizado. Enter para salir.")
